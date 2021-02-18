@@ -4,6 +4,7 @@ db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nick name = db.Column(db.String, nullable=False)
     addresses = db.relationship('Address', backref='person', lazy=True)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
@@ -80,9 +81,34 @@ class Invite(db.Model):
 
     def serialize(self):
         return {
-            "eventunitno": self.eventunitno,
-            "invitees": list(map(lambda x: x.serialize(), self.invitees))
-            "eventstreetaddress": self.eventstreetaddress,
-            "eventunitno": self.eventunitno,
+            "user_email": self.user_email,
+            "statusofinvite": self.statusofinvite,
+            "event_eventname": self.eventstreetaddress,
+            
+        }
+
+class Comment(db.Model):
+    text = db.column(db.String(50), nullable=False)
+    user = 
+    Datestamp = db.Column(db.String, db.ForeignKey('user.email'), primary_key=True)
+    statusofinvite = db.Column(db.String(50), nullable=False)
+    event_eventname = db.Column(db.String, db.ForeignKey('event.eventname')
+        nullable=False)
+
+
+# Comment text
+# Comment user (one-to-one relationship to user model)
+# Date stamp
+# Event (one-to-one relationship to event model)
+
+
+    def __repr__(self):
+        return '<Invite {self.eventname}>'
+
+    def serialize(self):
+        return {
+            "user_email": self.user_email,
+            "statusofinvite": self.statusofinvite,
+            "event_eventname": self.eventstreetaddress,
             
         }
