@@ -1,17 +1,17 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
-
-association_table = Table('association', Base.metadata,
-Column("user_id", Integer, ForeignKey("User.id"), primary_key=True),
-Column("event_id", Integer, ForeignKey("Event.id"), primary_key=True)
+association = db.Table('association', 
+db.Column("user_id", db.Integer, db.ForeignKey("User.id"), primary_key=True),
+db.Column("event_id", db.Integer, db.ForeignKey("Event.id"), primary_key=True)
 )
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nick_name = db.Column(db.String(50), unqie=True, nullable=False)
-    addresses = db.relationship(db.String(50), nullable=False)
+    nick_name = db.Column(db.String(50), unique=True, nullable=False)
+    addresses = db.Column(db.String(50), nullable=False)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(50), nullable=False)
@@ -23,11 +23,12 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    events = relationship("Events",secondary=association_table, back_="users", nullable=True)
+    events = db.relationship("Event",secondary=association, lazy='subquery', 
+        backref=db.backref('users', lazy=True))
     lat= db.Column(db.String(), unique=False, nullable=True)
     lng= db.Column(db.String(), unique=False, nullable=True)
     
-    
+
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -35,8 +36,8 @@ class User(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "email": self.email,
-            "email": list(map(lambda x: x.serialize(), self.user))
+            "nick_name": self.nick_name,
+            "address": self.address,
             "firstname": self.firstname,
             "lastname": self.lastname,
             "address": self.address,
@@ -45,14 +46,23 @@ class User(db.Model):
             "zipcode": self.address,
             "bday": self.address,
             "gender": self.address,
+            "email": self.email,
+            "events":list(map(lambda x: x.serialize(), self.events)),
+            "lat":self.lat,
+            "lng":self.lng
+            
+            }
+
+
 
 
             # do not serialize the password, its a security breach
-        }
+    
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    invitees = db.relationship('Invite', backref='event', lazy=True)
-    eventname= db.column(db.String(50), primary_key=True)
+    invitees = db.Column(db.String(50), nullable=False)
+    eventname= db.Column(db.String(50), nullable=False)
     eventstreetaddress = db.Column(db.String(50), nullable=False)
     eventunitno = db.Column(db.String(50), nullable=False)
     eventstate = db.Column(db.String(50), nullable=False)
@@ -61,15 +71,18 @@ class Event(db.Model):
     eventdescription = db.Column(db.String(50), nullable=False)
     # eventpicture = db.Column(db.String(50), nullable=False)
     eventstatus = db.Column(db.String(50), nullable=False)
-    eventcomments = db.relationship('comment'), backref'event', lazy=True)
+    users = db.relationship("User",secondary=association, lazy='subquery', 
+        backref=db.backref('events', lazy=True))
+    comments = db.relationship('Comment', backref='Event', lazy=True)
 
     def __repr__(self):
         return '<Event {self.eventname}>'
 
     def serialize(self):
         return {
-            "invitees": list(map(lambda x: x.serialize(), self.invitees))
-            "eventname":list(map(lambda x: x.serrialze(), self.eventname))
+            "id": self.id,
+            "invitees": self.invitees,
+            "eventname":self.eventname,
             "eventstreetaddress": self.eventstreetaddress,
             "eventunitno": self.eventunitno,
             "eventstate": self.eventstate,
@@ -77,8 +90,10 @@ class Event(db.Model):
             "eventzipcode": self.eventzipccode,
             "eventdescription": self.eventdescription,
             "eventstatus": self.eventstatus,
-            "eventcomments": list(map(lambda x: x.serial(), self.invitees))
+            "users":list(map(lambda x: x.serialize(), self.users)),
+            "comments": list(map(lambda x: x.serialize(), self.comments))
         }
+
 
 
 # class Invite(db.Model):
@@ -101,11 +116,11 @@ class Event(db.Model):
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    text = db.column(db.String(50), nullable=False)
-    user = db.Column(db.String, db.ForeignKey('user.email'), lazy=True, nullable=False)
-    Datestamp = db.Column(db.String, db.ForeignKey('user.email'), lazy=True, nullable = False )
-
-    event_eventname = db.Column(db.String, db.ForeignKey('event.eventname')
+    text = db.Column(db.String(50), nullable=False)
+    datestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'),
+        nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'),
         nullable=False)
 
     def __repr__(self):
@@ -113,47 +128,12 @@ class Comment(db.Model):
 
     def serialize(self):
         return {
-            "user_email": self.user_email,
-            "statusofinvite": self.statusofinvite,
-            "event_eventname": self.eventstreetaddress,
+            "id": self.id,
+            "text": self.text,
+            "datestamp": self.datestamp,
+            "user_id": list(map(lambda x:x.serialize(),self.user_id)),
+            "event_id": list(map(lambda x:x.serialize(),self.event_id))
+  
             
         }
 
-association_table = Table('association', Base.metadata,
-Column("sister_id", Integer, ForeignKey("Sister.id")),
-Column("brother_id", Integer, ForeignKey("Brother.id"))
-)
-
-class Sister(db.Model):
-    id = db.Column(Integer, primary_key=True)
-    name = db.Column(String(80), nullable=False)
-    brothers = relationship("Brother",
-                    secondary=association_table
-                    back_populates="sisters") # this line is so it updates the field when Sister is updated
-                    
-    def __ref__(self):
-        return f'<Sister {self.name}>'
-        
-    def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "brothers": list(map(lambda x: x.serialize(), self.brothers))
-        }
-
-class Brother(db.Model):
-    id = db.Column(Integer, primary_key=True)
-    name = db.Column(String(80), nullable=False)
-    sisters = relationship("Sister",
-                    secondary=association_table
-                    back_populates="brothers")
-                    
-    def __ref__(self):
-        return f'<Brother {self.name}>'
-        
-    def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "sisters": list(map(lambda x: x.serialize(), self.sisters))
-        }
