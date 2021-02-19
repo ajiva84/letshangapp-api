@@ -38,6 +38,27 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+@app.route('/signup', methods=['POST'])
+def signup():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)  
+      
+
+    if not email:
+        return jsonify({"msg": "Email is required"}), 400
+    if not password:
+        return jsonify({"msg": "Password is required"}), 400  
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        return jsonify({"msg": "Email  already exists"}), 400 
+
+    user = User(email=email, password=generate_password_hash(password), is_active=True)
+    db.session.add(user)
+    db.session.commit()    
+    
+    return jsonify({"msg": "User successfully registered"}),200
+
 # Handle/serialize errors like a JSON object
 @app.route("/login", methods=["POST"])
 def login():
@@ -55,6 +76,8 @@ def protected():
     # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
