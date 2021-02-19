@@ -4,14 +4,13 @@ from datetime import datetime
 db = SQLAlchemy()
 
 association = db.Table('association', 
-db.Column("user_id", db.Integer, db.ForeignKey("User.id"), primary_key=True),
-db.Column("event_id", db.Integer, db.ForeignKey("Event.id"), primary_key=True)
+db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
+db.Column("event_id", db.Integer, db.ForeignKey("event.id"), primary_key=True)
 )
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nick_name = db.Column(db.String(50), unique=True, nullable=False)
-    addresses = db.Column(db.String(50), nullable=False)
+    # nick_name = db.Column(db.String(50), unique=True, nullable=False)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(50), nullable=False)
@@ -22,30 +21,43 @@ class User(db.Model):
     gender = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean, unique=False, nullable=False)
     events = db.relationship("Event",secondary=association, lazy='subquery', 
-        backref=db.backref('users', lazy=True))
-    lat= db.Column(db.String(), unique=False, nullable=True)
-    lng= db.Column(db.String(), unique=False, nullable=True)
+        backref=db.backref('user', lazy=True))
+    lat= db.Column(db.String(50), unique=False, nullable=True)
+    lng= db.Column(db.String(50), unique=False, nullable=True)
     
-
+    def __init__(self, email, password, firstname, lastname, address, city, state, zipcode, bday, gender, lat, lng, is_active ):
+        self.email = email
+        self.password = password
+        self.firstname = firstname
+        self.lastname = lastname
+        self.address = address
+        self.city = city
+        self.state = state
+        self.zipcode = zipcode
+        self.bday = bday
+        self.gender = gender
+        self.lat = lat
+        self.lng = lng
+        self.is_active = is_active
+        
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.email 
 
     def serialize(self):
         return {
             "id": self.id,
             "nick_name": self.nick_name,
-            "address": self.address,
             "firstname": self.firstname,
             "lastname": self.lastname,
             "address": self.address,
-            "city": self.address,
-            "state": self.address,
-            "zipcode": self.address,
-            "bday": self.address,
-            "gender": self.address,
+            "city": self.city,
+            "state": self.state,
+            "zipcode": self.zipcode,
+            "bday": self.bday,
+            "gender": self.gender,
             "email": self.email,
             "events":list(map(lambda x: x.serialize(), self.events)),
             "lat":self.lat,
@@ -72,7 +84,7 @@ class Event(db.Model):
     # eventpicture = db.Column(db.String(50), nullable=False)
     eventstatus = db.Column(db.String(50), nullable=False)
     users = db.relationship("User",secondary=association, lazy='subquery', 
-        backref=db.backref('events', lazy=True))
+        backref=db.backref('event', lazy=True))
     comments = db.relationship('Comment', backref='Event', lazy=True)
 
     def __repr__(self):
