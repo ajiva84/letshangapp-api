@@ -115,7 +115,6 @@ class Event(db.Model):
         }
 
 
-
 # class Invite(db.Model):
 #     user_email = db.Column(db.String, db.ForeignKey('user.email'), primary_key=True )
 #     statusofinvite = db.Column(db.String(50), nullable=False)

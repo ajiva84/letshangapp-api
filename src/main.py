@@ -18,7 +18,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
 
-
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
@@ -85,6 +84,59 @@ def signup():
     
     return jsonify({"msg": "User successfully registered"}),200
 
+@app.route('/user/<int:id>', methods=['PUT'])
+def user_update(id):
+    body = request.get_json()
+    user = User.query.get(id)
+    if user is None:
+        raise APIException('User not found', status_code=404)    
+    if "last_name" in body:
+        user.last_name = body["last_name"]
+    if "address" in body:
+        user.address = body["address"]
+    if "birthday" in body:
+        user.birthday = body["birthday"]
+    if "email" in body:
+        user.email = body["email"]
+    if "password" in body:
+        user.password = generate_password_hash(body["password"])
+    if "first_name" in body:
+        user.first_name = body["first_name"]
+    if "nick_name" in body:
+        user.nick_name = body["nick_name"]
+    if "zipcode" in body:
+        user.zipcode = body["zipcode"]
+    if "state" in body:
+        user.state = body["state"]
+    if "lat" in body:
+        user.lat = body["lat"]
+    if "lng" in body:
+        user.lng = body["lng"]
+
+    db.session.commit()
+    return jsonify(user.serialize()), 200
+
+@app.route('/user/<int:id>', methods=['GET'])
+def user_get(id):
+    user = User.query.get(id)
+    return jsonify(user.serialize()), 200
+# def user_get(id):
+#     users = User.query.filter_by(id = id).first()
+#     seri_users = []
+#     for user in users:
+#         seri_users.append(user.serialize())
+#     return jsonify(seri_users), 200
+
+@app.route('/user/<int:id>', methods=['DELETE'])
+def user_delete(id):
+    user = User.query.get(id)
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify( {
+        
+        "msg": "User successfully deleted"
+        }), 200
 @app.route('/event', methods=['POST'])
 def event():
     invitees = request.json.get("invitees", None)
@@ -125,6 +177,50 @@ def event():
     return jsonify({"msg": "Event has been created successfully"}),200
 
 
+
+@app.route('/event/<int:id>', methods=['PUT'])
+def event_update(id):
+    body = request.get_json()
+    event = Event.query.get(id)
+    if event is None:
+        raise APIException('Event not found', status_code=404)    
+    if "invitees" in body:
+        event.invitees = body["invitees"]
+    if "event_organizer" in body:
+        event.event_organizer = body["event_organizer"]
+    if "event_name" in body:
+        event.event_name = body["event_name"]
+    if "event_address" in body:
+        event.event_address = body["event_address"]
+    if "event_suiteno" in body:
+        event.event_suiteno = body["event_suiteno"]
+    if "event_city" in body:
+        event.event_city = body["event_city"]
+    if "event_zipcode" in body:
+        event.event_zipcode = body["event_zipcode"]
+    if "event_state" in body:
+        event.event_state = body["event_state"]
+    if "event_description" in body:
+        event.event_description = body["event_description"]
+    
+    db.session.commit()
+    return jsonify(event.serialize()), 200
+
+@app.route('/event/<int:id>', methods=['GET'])
+def event_get(id):
+    event = Event.query.get(id)
+    return jsonify(event.serialize()), 200
+
+@app.route('/event/<int:id>', methods=['DELETE'])
+def event_delete(id):
+    event = Event.query.get(id)
+    db.session.delete(event)
+    db.session.commit()
+
+    return jsonify( {
+        
+        "msg": "Event successfully deleted"
+        }), 200
 
 # Handle/serialize errors like a JSON object
 @app.route("/login", methods=["POST"])
@@ -178,98 +274,6 @@ def protected():
         
         "logged_in_as": current_user,
         "msg": "Access Granted to protected route"
-        }), 200
-
-
-@app.route('/user/<int:id>', methods=['PUT'])
-def user_update(id):
-    body = request.get_json()
-    user = User.query.get(id)
-    if user is None:
-        raise APIException('User not found', status_code=404)    
-    if "last_name" in body:
-        user.last_name = body["last_name"]
-    if "address" in body:
-        user.address = body["address"]
-    if "birthday" in body:
-        user.birthday = body["birthday"]
-    if "email" in body:
-        user.email = body["email"]
-    if "first_name" in body:
-        user.first_name = body["first_name"]
-    if "nick_name" in body:
-        user.nick_name = body["nick_name"]
-    if "zipcode" in body:
-        user.zipcode = body["zipcode"]
-    if "state" in body:
-        user.state = body["state"]
-    if "lat" in body:
-        user.lat = body["lat"]
-    if "lng" in body:
-        user.lng = body["lng"]
-
-    db.session.commit()
-    return jsonify(user.serialize()), 200
-
-@app.route('/user/<int:id>', methods=['GET'])
-def user_get(id):
-    user = User.query.get(id)
-    return jsonify(user.serialize()), 200
-
-@app.route('/user/<int:id>', methods=['DELETE'])
-def user_delete(id):
-    user = User.query.get(id)
-    db.session.delete(user)
-    db.session.commit()
-
-    return jsonify( {
-        
-        "msg": "User successfully deleted"
-        }), 200
-
-
-@app.route('/event/<int:id>', methods=['PUT'])
-def event_update(id):
-    body = request.get_json()
-    event = Event.query.get(id)
-    if event is None:
-        raise APIException('Event not found', status_code=404)    
-    if "invitees" in body:
-        event.invitees = body["invitees"]
-    if "event_organizer" in body:
-        event.event_organizer = body["event_organizer"]
-    if "event_name" in body:
-        event.event_name = body["event_name"]
-    if "event_address" in body:
-        event.event_address = body["event_address"]
-    if "event_suiteno" in body:
-        event.event_suiteno = body["event_suiteno"]
-    if "event_city" in body:
-        event.event_city = body["event_city"]
-    if "event_zipcode" in body:
-        event.event_zipcode = body["event_zipcode"]
-    if "event_state" in body:
-        event.event_state = body["event_state"]
-    if "event_description" in body:
-        event.event_description = body["event_description"]
-    
-    db.session.commit()
-    return jsonify(event.serialize()), 200
-
-@app.route('/event/<int:id>', methods=['GET'])
-def event_get(id):
-    event = Event.query.get(id)
-    return jsonify(event.serialize()), 200
-
-@app.route('/event/<int:id>', methods=['DELETE'])
-def event_delete(id):
-    event = Event.query.get(id)
-    db.session.delete(event)
-    db.session.commit()
-
-    return jsonify( {
-        
-        "msg": "Event successfully deleted"
         }), 200
 
 # this only runs if `$ python src/main.py` is executed
