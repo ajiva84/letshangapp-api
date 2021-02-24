@@ -15,7 +15,8 @@ class User(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(50), nullable=False)
-    # Apt_no = db.column(db.string(50), nullable=True)
+    friends = db.Column(db.String(50), nullable=True)
+    unitno = db.Column(db.String(50), nullable=True)
     city = db.Column(db.String(50), nullable=False)
     state = db.Column(db.String(50), nullable=False)
     zipcode = db.Column(db.String(50), nullable=False)
@@ -62,6 +63,8 @@ class User(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "address": self.address,
+            "unitno": self.unitno,
+            "friends": self.friends,
             "city": self.city,
             "state": self.state,
             "zipcode": self.zipcode,
