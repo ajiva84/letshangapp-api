@@ -30,23 +30,7 @@ class User(db.Model):
     lat= db.Column(db.String(50), unique=False, nullable=True)
     lng= db.Column(db.String(50), unique=False, nullable=True)
     
-    # def __init__(self, email, password, firstname, lastname, address, city, state, zipcode, bday, gender, lat, lng, is_active ):
-    #     self.email = email
-
-    #     self.password = password
-    #     self.firstname = firstname
-    #     self.lastname = lastname
-    #     self.address = address
-    #     self.city = city
-    #     self.state = state
-    #     self.zipcode = zipcode
-    #     self.bday = bday
-    #     self.gender = gender
-    #     self.lat = lat
-    #     self.lng = lng
-    #     self.is_active = is_active
         
-
     def __repr__(self):
         return '<User %r>' % self.email 
 
@@ -76,7 +60,6 @@ class User(db.Model):
             "lng":self.lng
             
             }
-
 
             # do not serialize the password, its a security breach
 
@@ -118,24 +101,6 @@ class Event(db.Model):
         }
 
 
-# class Invite(db.Model):
-#     user_email = db.Column(db.String, db.ForeignKey('user.email'), primary_key=True )
-#     statusofinvite = db.Column(db.String(50), nullable=False)
-#     event_eventname = db.Column(db.String, db.ForeignKey('event.eventname')
-#         nullable=False)
-
-
-#     def __repr__(self):
-#         return '<Invite {self.eventname}>'
-
-#     def serialize(self):
-#         return {
-#             "user_email": self.user_email,
-#             "statusofinvite": self.statusofinvite,
-#             "event_eventname": self.eventstreetaddress,
-            
-#         }
-
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(50), nullable=False)
@@ -155,7 +120,6 @@ class Comment(db.Model):
             "datestamp": self.datestamp,
             "user_id": list(map(lambda x:x.serialize(),self.user_id)),
             "event_id": list(map(lambda x:x.serialize(),self.event_id))
-  
             
         }
 

@@ -214,7 +214,9 @@ def event_update(id):
     body = request.get_json()
     event = Event.query.get(id)
     if event is None:
-        raise APIException('Event not found', status_code=404)    
+        raise APIException('Event not found', status_code=404)
+    if "users" != None:
+        event.users = body["users"]    
     if "invitees" in body:
         event.invitees = body["invitees"]
     if "event_organizer" in body:
