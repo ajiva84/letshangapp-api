@@ -39,6 +39,37 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+@app.route('/user', methods=['POST', 'GET'])
+def handle_user():
+    """
+    Create user and retrieve all users
+    """
+
+    # POST request
+    # if request.method == 'POST':
+    #     body = request.get_json()
+
+    #     if body is None:
+    #         raise APIException("You need to specify the request body as a json object", status_code=400)
+
+    #     if 'email' not in body:
+    #         raise APIException('You need to specify the email', status_code=400)
+    #     if 'password' not in body:
+    #         raise APIException('You need to specify the password', status_code=400)    
+
+    #     user1 = User(email=body['email'], password=body['password'])
+    #     db.session.add(user1)
+    #     db.session.commit()
+    #     return "ok", 200
+
+    # GET request
+    if request.method == 'GET':
+        all_people = User.query.all()
+        all_people = list(map(lambda x: x.serialize(), all_people))
+        return jsonify(all_people), 200
+
+    return "Invalid Method", 404
+
 @app.route('/signup', methods=['POST'])
 def signup():
     email = request.json.get("email", None)
@@ -232,16 +263,26 @@ def login():
         
     email = request.json.get("email", None)
     password = request.json.get("password", None)
+    lat = request.json.get("lat", None)
+    lng = request.json.get("lng", None)
+    
 
     if not email:
         return jsonify({"msg": "Missing email paramter"}), 400
     if not password:
         return jsonify({"msg": "Missing password paramter"}), 400
+    if not lat:
+        return jsonify({"msg": "Missing lat paramter"}), 400
+    if not lng:
+        return jsonify({"msg": "Missing lng paramter"}), 400
 
 
     try:
         user = User.query.filter_by(email=email).first()
         if user.validate(password):
+            user.lat = lat
+            user.lng = lng
+            db.session.commit()
             expires = datetime.timedelta(days=7)
             response_msg = {
                 "user":user.serialize(),
