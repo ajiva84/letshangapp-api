@@ -84,6 +84,7 @@ class Event(db.Model):
             "invitees": self.invitees,
             "event_name":self.event_name,
             "event_location": self.event_location,
+            "event_address":self.event_address,
             "event_organizer":self.event_organizer,
             "event_description": self.event_description,
             # "eventstatus": self.eventstatus,
