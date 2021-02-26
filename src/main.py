@@ -152,7 +152,7 @@ def user_get(id):
 
 @app.route('/events/all', methods=['GET'])
 def event_getall():
-    event = Event.query.all
+    event = Event.query.all()
     return jsonify(event.serialize()), 200
 # def user_get(id):
 #     users = User.query.filter_by(id = id).first()
