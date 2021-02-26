@@ -149,6 +149,11 @@ def user_update(id):
 def user_get(id):
     user = User.query.get(id)
     return jsonify(user.serialize()), 200
+
+@app.route('/events/all', methods=['GET'])
+def event_getall():
+    event = Event.query.all
+    return jsonify(event.serialize()), 200
 # def user_get(id):
 #     users = User.query.filter_by(id = id).first()
 #     seri_users = []
