@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 5427a18066a8
+Revision ID: f20978a4bd90
 Revises: 
-Create Date: 2021-02-20 15:10:48.753948
+Create Date: 2021-02-26 01:53:09.711416
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5427a18066a8'
+revision = 'f20978a4bd90'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,10 +24,7 @@ def upgrade():
     sa.Column('event_organizer', sa.String(length=50), nullable=False),
     sa.Column('event_name', sa.String(length=50), nullable=False),
     sa.Column('event_address', sa.String(length=50), nullable=False),
-    sa.Column('event_suiteno', sa.String(length=50), nullable=True),
-    sa.Column('event_state', sa.String(length=50), nullable=False),
-    sa.Column('event_city', sa.String(length=50), nullable=False),
-    sa.Column('event_zipcode', sa.String(length=50), nullable=False),
+    sa.Column('event_location', sa.String(length=50), nullable=False),
     sa.Column('event_description', sa.String(length=50), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
@@ -37,6 +34,8 @@ def upgrade():
     sa.Column('first_name', sa.String(length=50), nullable=False),
     sa.Column('last_name', sa.String(length=50), nullable=False),
     sa.Column('address', sa.String(length=50), nullable=False),
+    sa.Column('friends', sa.String(length=50), nullable=True),
+    sa.Column('unitno', sa.String(length=50), nullable=True),
     sa.Column('city', sa.String(length=50), nullable=False),
     sa.Column('state', sa.String(length=50), nullable=False),
     sa.Column('zipcode', sa.String(length=50), nullable=False),

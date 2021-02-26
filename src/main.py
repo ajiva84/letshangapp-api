@@ -106,8 +106,6 @@ def signup():
     zipcode = zipcode,
     birthday = birthday,
     gender = gender,
-    # Lat= Lat,
-    # lng=lng
     )
 
     db.session.add(user)
@@ -173,11 +171,8 @@ def event():
     invitees = request.json.get("invitees", None)
     event_organizer = request.json.get("event_organizer", None)
     event_name = request.json.get("event_name", None)
-    event_address= request.json.get("event_address", None)  
-    event_suiteno= request.json.get("event_suiteno", None)
-    event_zipcode = request.json.get("event_zipcode", None)
-    event_city = request.json.get("event_city", None)
-    event_state= request.json.get("event_state", None)
+    event_address= request.json.get("event_address", None)
+    event_location= request.json.get("event_location", None)
     event_description = request.json.get("event_description", None)
 
     if not invitees:
@@ -192,14 +187,9 @@ def event():
     event = Event(invitees=invitees,
     event_organizer=event_organizer,
     event_name= event_name,
+    event_location = event_location,
     event_address= event_address,
-    event_suiteno=event_suiteno, 
-    event_zipcode = event_zipcode,
-    event_city = event_city,
-    event_state = event_state,
     event_description = event_description
-    # Lat= Lat,
-    # lng=lng
     )
 
     db.session.add(event)

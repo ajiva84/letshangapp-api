@@ -69,13 +69,8 @@ class Event(db.Model):
     event_organizer = db.Column(db.String(50), nullable=False)
     event_name= db.Column(db.String(50), nullable=False)
     event_address = db.Column(db.String(50), nullable=False)
-    event_suiteno = db.Column(db.String(50), nullable=True)
-    event_state = db.Column(db.String(50), nullable=False)
-    event_city = db.Column(db.String(50), nullable=False)
-    event_zipcode = db.Column(db.String(50), nullable=False)
+    event_location = db.Column(db.String(50), nullable=False)
     event_description = db.Column(db.String(50), nullable=False)
-    # eventpicture = db.Column(db.String(50), nullable=False)
-    # eventstatus = db.Column(db.String(50), nullable=False)
     users = db.relationship("User",secondary=association, lazy='subquery', 
         backref=db.backref('event', lazy=True))
     comments = db.relationship('Comment', backref='Event', lazy=True)
@@ -88,12 +83,8 @@ class Event(db.Model):
             "id": self.id,
             "invitees": self.invitees,
             "event_name":self.event_name,
+            "event_location": self.event_location,
             "event_organizer":self.event_organizer,
-            "event_address": self.event_address,
-            "event_suiteno": self.event_suiteno,
-            "event_state": self.event_state,
-            "event_city": self.event_city,
-            "event_zipcode": self.event_zipcode,
             "event_description": self.event_description,
             # "eventstatus": self.eventstatus,
             "users":list(map(lambda x: x.serialize(), self.users)),
